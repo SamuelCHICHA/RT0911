@@ -1,3 +1,6 @@
 __pycache__
 Pipfile.lock
 mqtt_conn_config.json
+map.json
+vehicule.json
+mosquitto.conf
