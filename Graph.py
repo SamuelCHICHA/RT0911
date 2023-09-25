@@ -1,8 +1,23 @@
+from typing import Tuple
+
 class Graph:
     def __init__(self, matrix : list) -> None:
+        """Crée un graphe à partir d'une matrice
+
+        Args:
+            matrix (list): matrice d'adjacence
+        """
         self._matrix = matrix
 
-    def dijkstra(self, source: int) -> list:
+    def dijkstra(self, source: int) -> Tuple[list, list]:
+        """Crée une arborescence en utilisant l'algorithme de dijkstra
+
+        Args:
+            source (int): sommet de départ
+
+        Returns:
+            Tuple[list, list]: distances depuis le sommet de départ, pères dans l'arborescence
+        """
         distances = {}
         previous = {}
         queue = []
@@ -27,7 +42,7 @@ class Graph:
             # Pour chaque sommet
             for i in range(len(self._matrix[u])):
                 # On regarde si c'est un sommet voisin du sommet parsé
-                if self._matrix[u][i] is not None and self._matrix[u][i] is not 0:
+                if self._matrix[u][i] == 1:
                     alt = distances[u] + self._matrix[u][i]
                     # On regarde si la distance alternative est plus petite que celle actuelle et on la change si c'est le cas
                     if distances[i] is None or alt < distances[i]:
@@ -35,7 +50,16 @@ class Graph:
                         previous[i] = u
         return distances, previous
             
-    def shortest_path(self, source: int, target: int):
+    def shortest_path(self, source: int, target: int) -> list:
+        """Permet de récupérer le chemin le plus court à partir d'une arborescence (dijkstra)
+
+        Args:
+            source (int): sommet de départ
+            target (int): sommet d'arrivée
+
+        Returns:
+            list: chemin du sommet de départ jusqu'au sommet d'arrivée
+        """
         path = [target]
         _, previous = self.dijkstra(source)
         prev = previous[target]
