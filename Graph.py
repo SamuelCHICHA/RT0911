@@ -61,10 +61,13 @@ class Graph:
             list: chemin du sommet de départ jusqu'au sommet d'arrivée
         """
         path = [target]
+        # On récupère l'arborescence
         _, previous = self.dijkstra(source)
         prev = previous[target]
+        # On la remonte jusqu'à trouver le sommet de départ
         while prev is not None:
             path.append(prev)
             prev = previous[prev]
+        # On inverse le chemin
         path.reverse()
         return path
