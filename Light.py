@@ -1,6 +1,6 @@
 from Point import Point
 
-class Intersection(Point):
+class Light(Point):
     # Etat des feux (croisements)
     RED = 0
     GREEN = 1
