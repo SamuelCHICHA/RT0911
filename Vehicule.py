@@ -35,11 +35,11 @@ class Vehicule:
         
     @classmethod
     def load_vehicule(cls, file_path : str):
-        with open(file_path) as vehicule_file:
-            vehicule_config = json.load(vehicule_file)
-            id = vehicule_config['id']
-            initial_position = Point(vehicule_config['path'][0]['x'], vehicule_config['path'][0]['y'])
-            start = vehicule_config['start']
-            speed = vehicule_config['speed']
-            path = vehicule_config['path']
-            return Vehicule(id, initial_position, start, speed, path)
+        parser = configparser.ConfigParser()
+        parser.read(file_path)
+        id = int(parser['general_informations']['id'])
+        initial_position = Point.from_tuple(eval(parser['general_informations']['init_position']))
+        start = int(parser['general_informations']['time_start'])
+        speed = int(parser['general_informations']['speed'])
+        return Vehicule(id, initial_position, start, speed, [])
+        
