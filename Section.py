@@ -10,14 +10,21 @@ class Section:
     class Decoder(json.JSONDecoder):
         def decode(self, s: str) -> Point:
             obj = super().decode(s)
-            return Point(obj['posA'], obj['posB'])
+            return Point(obj['id'], obj['posA'], obj['posB'])
     
-    def __init__(self, posA : Point, posB : Point):
+    def __init__(self, id : int, posA : Point, posB : Point):
+        self.id = id
         self.posA = posA
         self.posB = posB
 
+    def __str__(self):
+        return f"Section {json.dumps(self, cls=self.__class__.Encoder)}"
+    
     def __repr__(self):
         return f"Section {json.dumps(self, cls=self.__class__.Encoder)}"
     
     def __eq__(self, __value: object) -> bool:
-        return __value.posA == self.posA and __value.posB == self.posB
+        return self.id == __value.id and __value.posA == self.posA and __value.posB == self.posB
+
+    def get_translation(self) -> Point:
+        return self.posB - self.posA
