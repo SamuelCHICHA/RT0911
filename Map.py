@@ -37,7 +37,7 @@ class Map:
             self.intersections = []
             for id in parser['trafficLights']:
                 x, y = eval(parser['trafficLights'][id])
-                self.intersections.append(Light(Point(x, y)))
+                self.intersections.append(Light(id, Point(x, y)))
         return self.intersections
 
     def get_graph(self) -> Graph:
@@ -54,8 +54,3 @@ class Map:
                 matrix[section.posA.__repr__()][section.posB.__repr__()] = {}
             matrix[section.posA.__repr__()][section.posB.__repr__()] = abs(section.posA.y - section.posB.y if section.posA.x == section.posB.x else section.posA.x - section.posB.x)
         return Graph(matrix)
-
-# parser = configparser.ConfigParser()
-# parser.read('map.ini')
-# for id in parser['trafficLights']:
-#     print(id)
