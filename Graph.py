@@ -1,7 +1,8 @@
 from typing import Tuple
+from typing import Union
 
 class Graph:
-    def __init__(self, matrix : list) -> None:
+    def __init__(self, matrix : dict) -> None:
         """Crée un graphe à partir d'une matrice
 
         Args:
@@ -9,7 +10,7 @@ class Graph:
         """
         self._matrix = matrix
 
-    def dijkstra(self, source: int) -> Tuple[list, list]:
+    def dijkstra(self, source: Union[str, int]) -> Tuple[list, list]:
         """Crée une arborescence en utilisant l'algorithme de dijkstra
 
         Args:
@@ -20,13 +21,14 @@ class Graph:
         """
         distances = {}
         previous = {}
+        visited = {}
         queue = []
-        visited = [False for _ in range(len(self._matrix))]
         # Intialisation
-        for i in range(len(self._matrix)):
-            distances[i] = None
-            previous[i] = None
-            queue.append(i)
+        for vertice in self._matrix.keys():
+            visited[vertice] = False
+            distances[vertice] = None
+            previous[vertice] = None
+            queue.append(vertice)
         distances[source] = 0
         while len(queue) != 0:
             min = None
@@ -40,17 +42,17 @@ class Graph:
             u = queue.pop(queue.index(min_index))
             visited[u] = True
             # Pour chaque sommet
-            for i in range(len(self._matrix[u])):
+            for vertice, edge_weight in self._matrix[u].items():
                 # On regarde si c'est un sommet voisin du sommet parsé
-                if self._matrix[u][i] == 1:
-                    alt = distances[u] + self._matrix[u][i]
+                if edge_weight is not None:
+                    alt = distances[u] + edge_weight
                     # On regarde si la distance alternative est plus petite que celle actuelle et on la change si c'est le cas
-                    if distances[i] is None or alt < distances[i]:
-                        distances[i] = alt
-                        previous[i] = u
+                    if distances[vertice] is None or alt < distances[vertice]:
+                        distances[vertice] = alt
+                        previous[vertice] = u
         return distances, previous
             
-    def shortest_path(self, source: int, target: int) -> list:
+    def shortest_path(self, source: Union[str, int], target: Union[str, int]) -> list:
         """Permet de récupérer le chemin le plus court à partir d'une arborescence (dijkstra)
 
         Args:

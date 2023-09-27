@@ -5,45 +5,32 @@ import json
 
 # Classe Véhicule
 class Vehicule:
-    
+    class Encoder(json.JSONEncoder):
+        def default(self, o: Vehicule) -> dict:
+            return o.__dict__
+        
+    class Decoder(json.JSONDecoder):
+        def decode(self, s: str) -> Vehicule:
+            obj = super().decode(s)
+            return Vehicule(obj['id'], obj['position'], obj['start'], obj['speed'], [])
+
     # Création d'un véhicule
-    def __init__(self, id : int, position : Point, start : int, speed : int, hop_number : int, path : list):
+    def __init__(self, id : int, position : Point, start : int, speed : int, path : list):
         self.id = id
         self.position = position
         self.start = start
         self.speed = speed
-        self.hop_number = hop_number
         self.path = path
-        
-    # Modifier la position du véhicule
-    def setPosition(self, position : Point) -> None:
-        self.position = position
-        
-    # Récupérer la position du véhicule
-    def getPosition(self) -> Point:
-        return self.position
     
     # Affichage du véhicule
-    def __str__(self) -> str:
-        return f"Véhicule (id:{self.id}; start: {self.start}s; speed: {self.speed}km/h; hop_number: {self.hop_number}sauts, position : {self.position})"
+    def __repr__(self) -> str:
+        return f"Vehicule {json.dumps(self, cls=self.__class__.Encoder)}"
     
-    
-    # Convertir le véhicule en JSON
-    def convertirJson(self) -> str: 
-        x = {
-            "id": self.id,
-            "start": self.start,
-            "speed": self.speed,
-            "hop_nomber": self.hop_number,
-            "position": json.loads(self.position.convertirJson())
-        }
-        return json.dumps(x)
-    
-    def send_position(self, mqtt_client: MQTTClient, timestamp : int = 0) -> None:
+    def send_position(self, mqtt_client: MQTTClient, time_since_start : int = 0) -> None:
         mqtt_client.client.publish("", json.dumps({
             "id": self.id,
             "Pos": f"{self.position.x}, {self.position.y}",
-            "slot": timestamp
+            "slot": time_since_start
         }))
         
     @classmethod
@@ -55,30 +42,4 @@ class Vehicule:
             start = vehicule_config['start']
             speed = vehicule_config['speed']
             path = vehicule_config['path']
-            return Vehicule(id, initial_position, start, 0, speed, path)
-        
-        
-    
-# Véhicule 1
-# v1 = Vehicule(1, Point(0,0) ,12, 20, 2)
-# print(v1)
-# v1.setPosition(Point(1,65))
-# print(v1)
-
-
-# # Véhicule 3
-# v3 = Vehicule(1, Point(1,65) ,12, 20, 2)
-
-# vehicules = [v1.position, v3.position]
-
-# # Véhicule 2
-# v2 = Vehicule(1, Point(0,1) ,12, 20, 2)
-# print(v2)
-# print(Point.verifierSiPointVide(v2.position,vehicules))
-
-# v2.setPosition(Point(1,65))
-# print(Point.verifierSiPointVide(v2.position,vehicules))
-
-# print(v1)
-
-# print(v1.convertirJson())
+            return Vehicule(id, initial_position, start, speed, path)

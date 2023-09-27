@@ -1,8 +1,18 @@
 from __future__ import annotations
+from collections.abc import Callable
 import json
+from typing import Any
 
 # Classe Point
 class Point:
+    class Encoder(json.JSONEncoder):
+        def default(self, o: Point) -> dict:
+            return o.__dict__
+        
+    class Decoder(json.JSONDecoder):
+        def decode(self, s: str) -> Point:
+            obj = super().decode(s)
+            return Point(obj['x'], obj['y'])
     
     # Initialisation du point
     def __init__(self, x : int, y : int):
@@ -17,17 +27,13 @@ class Point:
         return True
         
     # Affichage du point
-    def __str__(self):
-        return f"(x:{self.x}; y:{self.y})"
+    def __repr__(self) -> str:
+        return f"({self.x},{self.y})"
+    
+    def __str__(self) -> str:
+        return f"Point {json.dumps(self, cls=self.__class__.Encoder)}"
     
     def __eq__(self, __value: object) -> bool:
         return __value.x == self.x and __value.y == self.y
     
     
-    # Convertir un point en JSON
-    def convertirJson(self): 
-        x = {
-            "x": self.x,
-            "y": self.y,
-        }
-        return json.dumps(x)
