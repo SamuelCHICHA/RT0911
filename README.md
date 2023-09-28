@@ -4,6 +4,12 @@
 
 Simuler le déplacement d'un véhicule sur une carte. Il devra s'adapter aux différentes contraintes comme les feux rouges et celles posées par les autres véhicules. On obtiendra les informations sur ces dernières à partir des différentes files MQTT mises à diisposition.
 
+## Comment l'utiliser
+
+* Install pipenv [docs](https://pipenv.pypa.io/en/latest/installation/)
+* Run `pipenv install`
+* Run `pipenv run python main.py`
+
 ## Spécifications
 
 * Le véhicule devra attendre le message donnant le signal de départ, après quoi il attendra x secondes avant de commencer à se déplacer.
