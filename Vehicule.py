@@ -1,9 +1,12 @@
 from __future__ import annotations
 from Point import Point
-from MQTTClient import MQTTClient
 import json
+import time
+import paho.mqtt.client as mqtt_client
 import configparser
 from Map import Map
+from Section import Section
+from Light import Light
 
 # Classe Véhicule
 class Vehicule:
@@ -17,22 +20,23 @@ class Vehicule:
             return Vehicule(obj['id'], obj['position'], obj['start'], obj['speed'], [])
 
     # Création d'un véhicule
-    def __init__(self, id : int, position : Point, start : int, speed : int, path : list):
+    def __init__(self, id : int, position : Point, start : int, speed : int, path : list, started_since : int = 0):
         self.id = id
         self.position = position
         self.start = start
         self.speed = speed
         self.path = path
+        self.started_since = started_since
     
     # Affichage du véhicule
     def __repr__(self) -> str:
         return f"Vehicule {json.dumps(self, cls=self.__class__.Encoder)}"
     
-    def send_position(self, mqtt_client: MQTTClient, time_since_start : int = 0) -> None:
-        mqtt_client.client.publish("", json.dumps({
+    def send_position(self, client: mqtt_client) -> None:
+        client.publish("position_pub", json.dumps({
             "id": self.id,
-            "Pos": f"{self.position.x}, {self.position.y}",
-            "slot": time_since_start
+            "Pos": f"{self.position.x},{self.position.y}",
+            "slot": self.started_since
         }))
         
     @classmethod
@@ -80,3 +84,21 @@ class Vehicule:
         graph = map.get_graph()
         sp = graph.shortest_path(self.position.__repr__(), destination_point.__repr__())
         return [Point.from_tuple(eval(p)) for p in sp]
+    
+    def hit_the_roads(self, destination: Point, map: Map, client: mqtt_client) -> None:
+        time.sleep(self.start)
+        # to do change to while to adapt path
+        previous_point = self.position
+        for next_point in self.get_path(map, destination)[1:]:
+            section = next(filter(lambda s: s.posA == previous_point and s.posB == next_point, map.get_sections()), None)
+            if section is not None:
+                while self.position != section.posB:
+                    self.started_since += 1
+                    self.advance_to_point(section.posB)
+                    print(self)
+                    self.send_position(client)
+                    time.sleep(1)
+                previous_point = next_point
+            else:
+                raise ValueError(f"This section {previous_point} - {next_point} does not exist.")
+        client.loop_stop()

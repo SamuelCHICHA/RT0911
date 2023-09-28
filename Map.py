@@ -8,7 +8,7 @@ class Map:
     def __init__(self, file_path : str) -> None:
         self.file_path = file_path
         self.sections = None
-        self.intersections = None
+        self.lights = None
 
     def get_sections(self) -> list[Section]:
         """Get the sections from the map file
@@ -25,20 +25,20 @@ class Map:
                 self.sections.append(Section(id, Point(xa, ya), Point(xb, yb)))
         return self.sections
     
-    def get_intersections(self) -> list[Light]:
+    def get_lights(self) -> list[Light]:
         """Get the intersections from the map file
 
         Returns:
-            list[Intersection]: list of intersections
+            list[Light]: list of traffic lights
         """
-        if self.intersections is None:
+        if self.lights is None:
             parser = configparser.ConfigParser()
             parser.read(self.file_path)
-            self.intersections = []
+            self.lights = []
             for id in parser['trafficLights']:
                 x, y = eval(parser['trafficLights'][id])
-                self.intersections.append(Light(id, Point(x, y)))
-        return self.intersections
+                self.lights.append(Light(id, Point(x, y)))
+        return self.lights
 
     def get_graph(self) -> Graph:
         """Transforms the map into a graph
