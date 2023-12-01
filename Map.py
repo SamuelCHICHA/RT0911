@@ -20,8 +20,8 @@ class Map:
             parser = configparser.ConfigParser()
             parser.read(self.file_path)
             self.sections = []
-            for id in parser['sections']:
-                xa, ya, xb, yb = eval(parser['sections'][id])
+            for id in parser['trip']:
+                xa, ya, xb, yb = eval(parser['trip'][id])
                 self.sections.append(Section(id, Point(xa, ya), Point(xb, yb)))
         return self.sections
     
@@ -35,8 +35,8 @@ class Map:
             parser = configparser.ConfigParser()
             parser.read(self.file_path)
             self.lights = []
-            for id in parser['trafficLights']:
-                x, y = eval(parser['trafficLights'][id])
+            for id in parser['trafficLight']:
+                x, y = eval(parser['trafficLight'][id])
                 self.lights.append(Light(id, Point(x, y)))
         return self.lights
 

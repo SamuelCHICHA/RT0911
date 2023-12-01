@@ -23,21 +23,21 @@ class Graph:
         previous = {}
         visited = {}
         queue = []
+        # Maximum graph weight
+        # graph_weight_max = max([value for vector in self._matrix.values() for value in vector.values()]) + 1
         # Intialisation
         for vertice in self._matrix.keys():
             visited[vertice] = False
-            distances[vertice] = None
+            distances[vertice] = float('inf')
             previous[vertice] = None
             queue.append(vertice)
         distances[source] = 0
         while len(queue) != 0:
-            min = None
-            min_index = None
             # On recherche l'index du sommet le plus près
-            for key, value in distances.items():
-                if visited[key] == False and value is not None and (min is None or min > value):
-                    min = value
-                    min_index = key
+            unvisited_vertices = {vertice: distance for vertice, distance in distances.items() if not visited[vertice] and distances[vertice] is not None}
+            if unvisited_vertices == {}:
+                raise ValueError("The queue is not empty.")
+            min_index = min(unvisited_vertices, key=unvisited_vertices.get)
             # On le récupère dans la queue
             u = queue.pop(queue.index(min_index))
             visited[u] = True
