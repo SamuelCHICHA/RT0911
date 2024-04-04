@@ -55,7 +55,7 @@ class Vehicule:
         }))
 
     @classmethod
-    def load_vehicule(cls, file_path : str):
+    def load_vehicule(cls, file_path : str) -> Vehicule:
         parser = configparser.ConfigParser()
         parser.read(file_path)
         id = int(parser['general_informations']['id'])
@@ -108,7 +108,8 @@ class Vehicule:
     def hit_the_roads(self, destination: Point, map: Map, client: mqtt_client) -> None:
         # to do change to while to adapt path
         with self._cv:
-            self._cv.wait_for(lambda: self.started_since != 1)
+            # Attente de l'action du 'TOP'
+            self._cv.wait_for(lambda: self.started_since == 1)
         previous_point = self.position
         for next_point in self.get_path(map, destination)[1:]:
             section = next(filter(lambda s: s.posA == previous_point and s.posB == next_point, map.get_sections()), None)

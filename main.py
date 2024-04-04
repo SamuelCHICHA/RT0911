@@ -5,6 +5,7 @@ from Vehicule import Vehicule
 from map.Point import Point
 from map.Map import Map
 from typing import Tuple
+from Observer import Observer
 
 def on_connect(client: mqtt_client, user_data: Tuple[Map, Vehicule, Point], flags, result_code: int):
     client.subscribe("positions")
@@ -16,8 +17,13 @@ def on_message(client: mqtt_client, _, msg):
     if msg.topic == "top":
         if vehicule.started_since == 0:
             vehicule.started_since = 1
-            vehicule._cv.notify()
+            with vehicule._cv:
+                vehicule._cv.notify()    
     if msg.topic == "positions":
+        pass
+    if msg.topic == "UT":
+        pass
+    if msg.topic == "RESP":
         pass
     elif msg.topic == "lights":
         lights = json.loads(msg.payload.decode())
@@ -25,6 +31,7 @@ def on_message(client: mqtt_client, _, msg):
             raise TypeError("Lights are supposed to be a dict.")
         for id, directions in lights.items():
             map.load_light_from_queue(int(id), eval(directions))
+            # print(lights)
             
     
     
@@ -50,5 +57,8 @@ client.enable_logger()
 client.on_connect = on_connect
 client.on_message = on_message
 client.connect(mqtt_host, mqtt_port)
+observer = Observer(mqtt_host, mqtt_port, vehicule)
+observer.start()
 client.loop_start()
 thread.join()
+observer.stop()
