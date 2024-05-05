@@ -1,5 +1,2 @@
 __pycache__
-Pipfile.lock
-mqtt_conn_config.json
-vehicule.json
 mosquitto.conf
