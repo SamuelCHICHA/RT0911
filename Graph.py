@@ -24,8 +24,7 @@ class Graph:
         visited = {}
         queue = []
         # Maximum graph weight
-        # graph_weight_max = max([value for vector in self._matrix.values() for value in vector.values()]) + 1
-        # Intialisation
+        # Initialisation
         for vertice in self._matrix.keys():
             visited[vertice] = False
             distances[vertice] = float('inf')

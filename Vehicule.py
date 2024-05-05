@@ -101,8 +101,11 @@ class Vehicule:
         Returns:
             list[Point]: list of points to go to
         """
+        # On crée le graphe à partir de la carte
         graph = map.get_graph()
+        # On récupère le plus court chemin du point de départ jusqu'à l'arrivée
         sp = graph.shortest_path(self.position.__repr__(), destination_point.__repr__())
+        # On renvoit la liste des points du plus court chemin
         return [Point.from_tuple(eval(p)) for p in sp]
 
     def hit_the_roads(self, destination: Point, map: Map, client: mqtt_client) -> None:
@@ -111,17 +114,25 @@ class Vehicule:
             # Attente de l'action du 'TOP'
             self._cv.wait_for(lambda: self.started_since == 1)
         previous_point = self.position
+        # Pour chaque point jusqu'à la destination
         for next_point in self.get_path(map, destination)[1:]:
+            # On retrouve la section qu'on doit emprûnter
             section = next(filter(lambda s: s.posA == previous_point and s.posB == next_point, map.get_sections()), None)
             if section is None:
                 raise ValueError(f"This section {previous_point} - {next_point} does not exist.")
+            # Tant qu'on a pas atteint le point suivant
             while self.position != section.posB:
+                # On incrémente le temps depuis lequel le véhicule est parti
                 self.started_since += 1
+                # On avance le véhicule
                 self.advance_to_point(section.posB)
                 print(self)
+                # On envoie la position du véhicule
                 self.send_position(client)
                 time.sleep(1)
+            # On récupère le feu de circulation sur le point
             light = map.get_light_from_position(section.posB)
+            # On vérifie si on peut avancer sinon on bloque
             if light is not None:
                 print(light)
                 stopped = False
@@ -137,6 +148,7 @@ class Vehicule:
                 elif self.direction == Vehicule.EAST and light.directions['west'] == 0:
                     stopped = True
                     wait_for = 'west'
+                # Tant qu'on est arrêté, on envoie quand même notre position
                 if stopped:
                     while light.directions[wait_for] == 0:
                         print(wait_for)
